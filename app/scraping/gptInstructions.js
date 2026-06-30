@@ -282,6 +282,34 @@ const restaurants = {
                 maxLength: 2
         `,
 
+    villaLido: (htmlText) => `
+        use the following openapi yaml schema - while using the specified hints on how to get the desired data - to parse the text afterwards into a response containing only valid json without any other text or explanations
+
+        the text contains a daily menu ("Tagesgerichte") of an italian restaurant. for every weekday (Montag, Dienstag, Mittwoch, Donnerstag, Freitag) there is a "Pizza des Tages" (pizza of the day) and a "Gericht des Tages" (dish of the day) with corresponding prices in euro. the language of the text is german.
+
+        definitions:
+          required: [dishes]
+          dishes:
+            type: array
+            items:
+              $ref: #/definitions/dish
+          dish:
+            type: object
+            required: [name, type, price, day]
+            properties:
+              name: # the name of the pizza or dish; keep apostrophes, double quotes and round brackets and the text within them; do not apply changes regarding grammar and spelling to the original dish name parsed from the text
+                type: string
+              type: # must be always one of ["PIZZA", "DISH"]; PIZZA for "Pizza des Tages", DISH for "Gericht des Tages"
+                type: string
+              price: # the price in euro; parse "€ 8,90" to 8.90 and "€ 10,20" to 10.20
+                type: double
+              day: # must be always one of ["MO", "DI", "MI", "DO", "FR", "SA", "SO"]
+                type: string
+                minLength: 2
+                maxLength: 2
+
+        ${htmlText}`,
+
     felsenkeller: () => `
         use the following openapi yaml schema - while using the specified hints on how to get the desired data - to parse the text afterwards into a response containing only valid json without any other text or explanations
         

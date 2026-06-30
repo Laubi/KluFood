@@ -28,6 +28,7 @@ const intersparRestaurantId = restaurants.interspar.id;
 const daMarioRestaurantId = restaurants.daMario.id;
 const burgerBoutiqueRestaurantId = restaurants.burgerBoutique.id;
 const felsenkellerRestaurantId = restaurants.felsenkeller.id;
+const villaLidoRestaurantId = restaurants.villaLido.id;
 
 const PARSING_SKIPPED = null;
 
@@ -653,6 +654,65 @@ async function getFelsenkellerPlan() {
     return menu;
 }
 
+function getVillaLidoWeekPlan() {
+    return urlCache.getUrls(villaLidoRestaurantId)
+        .then(urls => request.getAsync(JSON.parse(urls).scraperUrl))
+        .then(res => res.body)
+        .then(body => parseVillaLido(body));
+}
+
+async function parseVillaLido(html) {
+    winston.debug(`Parsing of "${villaLidoRestaurantId}" started ...`);
+    let menu = scraperHelper.getWeekEmptyModel();
+
+    let $ = cheerio.load(html);
+
+    let relevantHtmlPart = $.html($(".tagesgerichte_outer"));
+    winston.debug(`Relevant HTML content of "${villaLidoRestaurantId}": ${relevantHtmlPart}`);
+
+    if (relevantHtmlPart) {
+        let relevantHtmlPartPreviousHash = await menuHashCache.getHash(villaLidoRestaurantId);
+        let relevantHtmlPartHash = hashUtils.hashWithSHA256(relevantHtmlPart);
+        menuHashCache.updateIfNewer(villaLidoRestaurantId, relevantHtmlPartHash);
+
+        if (relevantHtmlPartPreviousHash === null || relevantHtmlPartPreviousHash !== relevantHtmlPartHash) {
+            const gptResponse = await gptHelper.letMeChatGptThatForYou(relevantHtmlPart, villaLidoRestaurantId);
+            const gptResponseContent = gptResponse.data.choices[0].message.content;
+            winston.debug(`ChatGPT response of "${villaLidoRestaurantId}": ${gptResponseContent}`);
+            const gptJsonAnswer = JSON.parse(gptResponseContent);
+
+            ["MO", "DI", "MI", "DO", "FR"].forEach(function (dayString, dayInWeek) {
+                let menuForDay = new Menu();
+
+                for (let dish of gptJsonAnswer.dishes) {
+                    if (dish.day === dayString) {
+                        let title = dish.type === "PIZZA" ? "Pizza des Tages" : "Gericht des Tages";
+                        let main = new Food(title, dish.price, true);
+
+                        let food = new Food(dish.name, null, false, false, null);
+                        main.entries.push(food);
+                        menuForDay.mains.push(main);
+                    }
+                }
+
+                if (menuForDay.mains.length > 0) {
+                    menu[dayInWeek] = menuForDay;
+                } else {
+                    winston.debug(`There is no menu for "${villaLidoRestaurantId}" on day with index ${dayInWeek}`);
+                    scraperHelper.setDayToError(menu, dayInWeek);
+                }
+            });
+        } else {
+            return PARSING_SKIPPED;
+        }
+    }
+
+    menu[5].alacarte = true;
+    menu[6].alacarte = true;
+
+    return menu;
+}
+
 module.exports = {
     getUniWirtWeekPlan,
     getHotspotWeekPlan,
@@ -663,5 +723,6 @@ module.exports = {
     getDaMarioWeekPlan,
     getBurgerBoutiquePlan,
     getFelsenkellerPlan,
+    getVillaLidoWeekPlan,
     PARSING_SKIPPED
 };
