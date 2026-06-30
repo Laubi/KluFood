@@ -37,6 +37,10 @@ class UrlCache {
             scraperUrl: "https://www.felsen-keller.at/wp-content/plugins/upload_karte/files/tageskarte.pdf",
             userFriendlyUrl: "https://www.felsen-keller.at/wp-content/plugins/upload_karte/files/tageskarte.pdf"
         });
+        this._updateIfNewer(restaurants.villaLido.id, {
+            scraperUrl: "https://www.villa-lido.at/speise-tageskarte/",
+            userFriendlyUrl: "https://www.villa-lido.at/speise-tageskarte/"
+        });
     }
 
     _setDynamicUrls() {

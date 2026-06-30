@@ -135,6 +135,10 @@ body {
   @include restaurantColors($felsenkellerTerracotta, white)
 }
 
+.villa-lido {
+  @include restaurantColors($villaLidoRed, white)
+}
+
 /* Menu Lists */
 .restaurant ul li {
   padding: 0;

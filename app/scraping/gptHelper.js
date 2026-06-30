@@ -45,6 +45,10 @@ async function letMeChatGptThatForYou(input, restaurantId) {
             prompt = gptInstructions.restaurants.felsenkeller();
             break;
         }
+        case restaurants.villaLido.id: {
+            prompt = gptInstructions.restaurants.villaLido(input);
+            break;
+        }
         default: {
             throw new Error(`Restaurant with id "${restaurantId}" is not supported for parsing with ChatGPT`);
         }

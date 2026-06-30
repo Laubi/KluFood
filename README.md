@@ -15,6 +15,7 @@ Verfügbar unter [food.fabian-feichter.at](https://food.fabian-feichter.at/)
 * Interspar
 * Da Mario
 * Burger Boutique
+* Villa Lido
 
 ## Info
 

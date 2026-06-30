@@ -89,6 +89,10 @@ module.exports = {
         felsenkeller: {
             id: "felsenkeller",
             name: "Felsenkeller"
+        },
+        villaLido: {
+            id: "villa-lido",
+            name: "Villa Lido"
         }
 
     },

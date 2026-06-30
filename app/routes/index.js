@@ -14,6 +14,7 @@ const interspar = restaurants.interspar.id;
 const daMario = restaurants.daMario.id;
 const burgerBoutique = restaurants.burgerBoutique.id;
 const felsenkeller = restaurants.felsenkeller.id;
+const villaLido = restaurants.villaLido.id;
 
 router.get('/', counter.countVisitors, function (req, res, next) {
     Promise.all([
@@ -25,7 +26,8 @@ router.get('/', counter.countVisitors, function (req, res, next) {
         menuCache.getMenu(interspar), urlCache.getUrls(interspar),
         menuCache.getMenu(daMario), urlCache.getUrls(daMario),
         menuCache.getMenu(burgerBoutique), urlCache.getUrls(burgerBoutique),
-        menuCache.getMenu(felsenkeller), urlCache.getUrls(felsenkeller)])
+        menuCache.getMenu(felsenkeller), urlCache.getUrls(felsenkeller),
+        menuCache.getMenu(villaLido), urlCache.getUrls(villaLido)])
         .then(results => {
             res.render('index', {
                 title: 'AAU Food',
@@ -65,6 +67,10 @@ router.get('/', counter.countVisitors, function (req, res, next) {
                 felsenkeller: {
                     menu: JSON.parse(results[16]) || [],
                     userFriendlyUrl: JSON.parse(results[17]).userFriendlyUrl
+                },
+                villaLido: {
+                    menu: JSON.parse(results[18]) || [],
+                    userFriendlyUrl: JSON.parse(results[19]).userFriendlyUrl
                 },
                 visitorStats: req.visitorStats,
                 restaurants
